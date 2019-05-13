@@ -6,6 +6,7 @@ from hermes_python.hermes import Hermes
 from hermes_python.ffi.utils import MqttOptions
 from hermes_python.ontology import *
 import io
+import toml
 
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
@@ -36,6 +37,26 @@ def action_wrapper(hermes, intentMessage, conf):
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
+    snips_opts = toml.load('/etc/snips.toml')
+    if 'mqtt' in snips_opts['snips-common']:
+        mqtt_opts.broker_address = snips_opts['snips-common']['mqtt']
+    if 'mqtt_username' in snips_opts['snips-common']:
+        mqtt_opts.username = snips_opts['snips-common']['mqtt_username']
+    if 'mqtt_password' in snips_opts['snips-common']:
+        mqtt_opts.password = snips_opts['snips-common']['mqtt_password']
+    if 'mqtt_tls_hostname' in snips_opts['snips-common']:
+        mqtt_opts.tls_hostname = snips_opts['snips-common']['mqtt_tls_hostname']
+    if 'mqtt_tls_disable_root_store' in snips_opts['snips-common']:
+        mqtt_opts.tls_disable_root_store = snips_opts['snips-common']['mqtt_tls_disable_root_store']
+    if 'mqtt_tls_cafile' in snips_opts['snips-common']:
+        mqtt_opts.tls_ca_file = snips_opts['snips-common']['mqtt_tls_cafile']
+    if 'mqtt_tls_capath' in snips_opts['snips-common']:
+        mqtt_opts.tls_ca_path = snips_opts['snips-common']['mqtt_tls_capath']
+    if 'mqtt_tls_client_cert' in snips_opts['snips-common']:
+        mqtt_opts.tls_client_cert = snips_opts['snips-common']['mqtt_tls_client_cert']
+    if 'mqtt_tls_client_key' in snips_opts['snips-common']:
+        mqtt_opts.tls_client_key = snips_opts['snips-common']['mqtt_tls_client_key']
+
     with Hermes(mqtt_options=mqtt_opts) as h:
         h.subscribe_intent("{{intent_id}}", subscribe_intent_callback) \
          .start()
